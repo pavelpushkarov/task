@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="1" author="admin">
+        <sql>
+            CREATE TABLE Products (
+                id SERIAL PRIMARY KEY,
+                title varchar(100) NOT NULL,
+                price decimal(12,2) NOT NULL
+            );
+
+            CREATE TABLE Customers (
+                id SERIAL PRIMARY KEY,
+                name varchar(100) NOT NULL
+            );
+
+            CREATE TABLE Orders (
+                id SERIAL PRIMARY KEY,
+                customer_id integer REFERENCES Customers (id),
+                product_id integer REFERENCES Products (id),
+                price decimal(12,2) NOT NULL
+            );
+        </sql>
+    </changeSet>
+
+    <changeSet id="2" author="admin">
+        <sql>
+            INSERT INTO Products (title, price)
+            VALUES
+               ('product1', 44.4),
+               ('product2', 100),
+               ('product3', 1);
+
+            INSERT INTO Customers (name)
+            VALUES
+                ('Albert'),
+                ('Vazgen'),
+                ('Hello');
+
+            INSERT INTO Orders (customer_id, product_id, price)
+            VALUES
+                ((SELECT id FROM Customers WHERE name='Albert'), (SELECT id FROM Products WHERE title='product1'), 44),
+                ((SELECT id FROM Customers WHERE name='Hello'), (SELECT id FROM Products WHERE title='product1'), 100),
+                ((SELECT id FROM Customers WHERE name='Hello'), (SELECT id FROM Products WHERE title='product1'), 256),
+                ((SELECT id FROM Customers WHERE name='Hello'), (SELECT id FROM Products WHERE title='product2'), 256);
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>
